@@ -50,7 +50,7 @@ const debounce = (fn, delay) => {
 };
 
 // https://github.com/WebReflection/document-register-element#v1-caveat
-class HTMLCustomElement extends HTMLElement {
+class HTMLCustomElement extends HTMLButtonElement {
   constructor(_) {
     return (_ = super(_)).init(), _;
   }
@@ -64,7 +64,6 @@ class ApplauseButton extends HTMLCustomElement {
     if (this._connected) {
       return;
     }
-
     this.classList.add("loading");
     this.style.display = "block";
     // when the color of the button is set via its color property, various
@@ -138,8 +137,8 @@ class ApplauseButton extends HTMLCustomElement {
       }
     }, 2000);
 
-    this.addEventListener("mousedown", event => {
-      if (event.button !== 0) {
+    const clapEventHandler = (event) => {
+      if (event.button !== 0 && event.key !== "Enter") {
         return;
       }
 
@@ -180,7 +179,10 @@ class ApplauseButton extends HTMLCustomElement {
       } else {
         this.classList.add("clap-limit-exceeded");
       }
-    });
+    };
+
+    this.addEventListener("mousedown", clapEventHandler);
+    this.addEventListener("keydown", clapEventHandler);
 
     getClaps(this.api, this.url).then(clapCount => {
       this.classList.remove("loading");
@@ -270,4 +272,4 @@ class ApplauseButton extends HTMLCustomElement {
   }
 }
 
-customElements.define("applause-button", ApplauseButton);
+customElements.define("applause-button", ApplauseButton, { extends: "button" });
